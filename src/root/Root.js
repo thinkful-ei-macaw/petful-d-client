@@ -66,7 +66,20 @@ export default class Root extends React.Component {
     <main>
       <Switch>
         <Route exact path="/" component={LandingPage} />
-        <Route exact path="/adopt" component={AdoptPage} />
+        <Route exact path="/adopt"
+        render={props=>(
+          <AdoptPage
+          {...props}
+          cats={this.state.cats}
+          dogs={this.state.dogs}
+          people={this.state.people}
+          updatePeople={() => this.updatePeople()}
+          updateCats={() => this.updateCats()}
+          updateDogs={() => this.updateDogs()}
+          adoptedDogs={this.filterAdoptedDogs()}
+          adoptedCats={this.filterAdoptedCats()}
+           />)}
+           />
       </Switch>
     </main>
   </div>
