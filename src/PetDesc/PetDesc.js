@@ -41,22 +41,22 @@ export default class PetDesc extends React.Component {
   };
 
   render() {
-    let pets = this.props.pets.length === 0 ? [''] : this.props.pets;
+    let pets = this.props.pets ? {} : this.props.pets;
     let petIndex = this.state.currentPetIndex;
     let adoptButton =
-      (this.state.currentPetIndex === 0 && !pets[0].adopter) ? (
+      (this.state.currentPetIndex === 0 && !pets.adopter) ? (
         <button
           className="adopt-button"
-          disabeled={pets[0].adopter == null ? 1 : 0}
+          disabeled={pets.adopter == null ? 1 : 0}
           onClick={() => this.adoptAPet()}>
           adopt me
         </button>
       ) : (
         <button className="adopt-button" disabled>
-          {pets[petIndex].adopter == null
+          {pets.adopter == null
             ? 'waiting to be adopted'
             : `I'm reserved by
-          ${pets[petIndex].adopter}`}
+          ${pets.adopter}`}
         </button>
       );
 
@@ -79,17 +79,17 @@ export default class PetDesc extends React.Component {
         <figure className="pet-image-container">
           <img
             className="pet-image"
-            src={pets[petIndex].imageURL}
-            alt={pets[petIndex].imageDescription}
+            src={pets.imageURL}
+            alt={pets.imageDescription}
           />
         </figure>
         <div className="pet-details">
           <ul>
-            <li>Name: {pets[petIndex].name}</li>
-            <li>Sex: {pets[petIndex].sex}</li>
-            <li>Age: {pets[petIndex].age}</li>
-            <li>Breed: {pets[petIndex].breed}</li>
-            <li>Story: {pets[petIndex].story}</li>
+            <li>Name: {pets.name}</li>
+            <li>Sex: {pets.sex}</li>
+            <li>Age: {pets.age}</li>
+            <li>Breed: {pets.breed}</li>
+            <li>Story: {pets.story}</li>
           </ul>
           {adoptButton}
         </div>

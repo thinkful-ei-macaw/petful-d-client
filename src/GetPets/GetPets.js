@@ -5,7 +5,7 @@ import PetDesc from '../PetDesc/PetDesc'
 export default class GetPets extends React.Component {
 
     renderAdoptedPets() {
-      let adoptedPetsArr = [...this.props.adoptedCats, ...this.props.adoptedDogs]
+      let adoptedPetsArr = [this.props.adoptedCats,this.props.adoptedDogs]
       let adoptedPets = adoptedPetsArr.map((pet, index) => {
         return (
           <li key={index} className="adoptedPet">

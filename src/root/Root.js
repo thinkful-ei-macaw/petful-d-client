@@ -6,11 +6,11 @@ import Services from '../Services';
 
 export default class Root extends React.Component {
   state={
-    cats: [],
-    dogs: [],
-    people: [],
-    adoptedDogs: [],
-    adoptedCats: [],
+    cats: {},
+    dogs: {},
+    people: {},
+    adoptedDogs: {},
+    adoptedCats: {},
   };
 
   componentDidMount() {
@@ -43,15 +43,15 @@ export default class Root extends React.Component {
     );
   };
 
-  filterAdoptedDogs = () => {
-    let adoptedDogs = this.state.dogs.filter(dog => dog.adopter !== null);
-    return adoptedDogs;
-  }
+  // filterAdoptedDogs = () => {
+  //   let adoptedDogs = this.state.dogs.filter(dog => dog.adopter !== null);
+  //   return adoptedDogs;
+  // }
 
-  filterAdoptedCats = () => {
-    let adoptedCats = this.state.cats.filter(cat => cat.adopter !== null);
-    return adoptedCats;
-  }
+  // filterAdoptedCats = () => {
+  //   let adoptedCats = this.state.cats.filter(cat => cat.adopter !== null);
+  //   return adoptedCats;
+  // }
   render(){
   return (
   <div>
@@ -76,8 +76,8 @@ export default class Root extends React.Component {
           updatePeople={() => this.updatePeople()}
           updateCats={() => this.updateCats()}
           updateDogs={() => this.updateDogs()}
-          adoptedDogs={this.filterAdoptedDogs()}
-          adoptedCats={this.filterAdoptedCats()}
+          adoptedDogs={this.state.dogs}
+          adoptedCats={this.state.cats}
           
            />)}
            />
