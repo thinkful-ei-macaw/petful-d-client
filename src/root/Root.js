@@ -78,7 +78,7 @@ export default class Root extends React.Component {
           updateDogs={() => this.updateDogs()}
           adoptedDogs={this.filterAdoptedDogs()}
           adoptedCats={this.filterAdoptedCats()}
-          test
+          
            />)}
            />
       </Switch>
