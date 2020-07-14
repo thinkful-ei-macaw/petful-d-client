@@ -79,7 +79,7 @@ export default class AdoptPage extends React.Component {
       this.context.onDeleteCat();
       this.context.onDeletePerson();
       this.props.history.push({
-          pathname: '/congrats',
+          pathname: '/success',
           state: this.context.cats
       })
 
@@ -89,7 +89,7 @@ export default class AdoptPage extends React.Component {
       this.context.onDeleteDog();
       this.context.onDeletePerson();
       this.props.history.push({
-          pathname: '/congrats',
+          pathname: '/success',
           state: this.context.dogs
       })
   }

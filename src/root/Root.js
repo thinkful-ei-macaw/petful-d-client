@@ -5,7 +5,7 @@ import LandingPage from '../LandingPage/LandingPage';
 import AdoptPage from '../AdoptPage/AdoptPage';
 import Context from '../Context';
 import config from '../config';
-// import Services from '../Services';
+import Success from '../Success/Success';
 
 export default class Root extends Component {
 
@@ -186,7 +186,7 @@ export default class Root extends Component {
           <Switch>
             <Route exact path='/' component={LandingPage} />
             <Route exact path='/adopt' component={AdoptPage} />
-            
+            <Router path='/success' component={Success} />
           </Switch>
         </Context.Provider>
       </div>
