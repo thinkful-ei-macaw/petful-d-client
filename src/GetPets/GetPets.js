@@ -6,10 +6,11 @@ export default class GetPets extends React.Component {
 
     renderAdoptedPets() {
       let adoptedPetsArr = [this.props.adoptedCats,this.props.adoptedDogs]
+      console.log(adoptedPetsArr,"arrAdopted");
       let adoptedPets = adoptedPetsArr.map((pet, index) => {
         return (
           <li key={index} className="adoptedPet">
-            <img src={pet.imageURL} />
+            <img src={pet.imageURL || ""} />
           </li>
         );
       });
@@ -18,16 +19,16 @@ export default class GetPets extends React.Component {
       return adoptedPets;
     }
   
-    renderAdoptedCats() {
-      let adoptedCats = this.props.adoptedCats.map((cat, index) => {
-        return (
-          <li key={index} className="adoptedCat">
-            <img src={cat.imageURL} />
-          </li>
-        );
-      });
-      return adoptedCats;
-    }
+    // renderAdoptedCats() {
+    //   let adoptedCats = this.props.adoptedCats.map((cat, index) => {
+    //     return (
+    //       <li key={index} className="adoptedCat">
+    //         <img src={cat.imageURL} />
+    //       </li>
+    //     );
+    //   });
+    //   return adoptedCats;
+    // }
   
   
     render() {

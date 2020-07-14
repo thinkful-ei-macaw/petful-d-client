@@ -41,7 +41,8 @@ export default class PetDesc extends React.Component {
   };
 
   render() {
-    let pets = this.props.pets ? {} : this.props.pets;
+    let pets = this.props.pets || {};
+    console.log(pets,"look")
     let petIndex = this.state.currentPetIndex;
     let adoptButton =
       (this.state.currentPetIndex === 0 && !pets.adopter) ? (
