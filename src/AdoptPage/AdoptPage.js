@@ -40,23 +40,34 @@ export default class AdoptPage extends React.Component {
   getInLine = () => {
       let count = 0;
       const interval = setInterval(() => {
+        if (this.context.people.length === 0) {
+          console.log("testtest")
+          this.context.onQueuePerson();
+
+            // setInterval(() => {
+            //     if (count === 4) {
+            //         return clearInterval()
+            //     }
+            //     this.context.onQueuePerson()
+            //     count++;
+            //     console.log(count)
+
+            // }, 2000);
+
+        }else if(this.context.people[0]===this.state.currentUser){
+          clearInterval(this.state.interval);
+          this.setState({
+              userCanAdopt: true
+          });
+
+        }
+        else{
+          
           this.context.onDeletePerson();
           this.context.onRandomAdoption();
-          if (this.context.people[1] === this.state.currentUser) {
-
-              setInterval(() => {
-                  if (count === 4) {
-                      return clearInterval()
-                  }
-                  this.context.onQueuePerson()
-                  count++
-                  console.log(count)
-
-              }, 2000);
-
-          }
-          this.userReady();
-      }, 2000);
+       
+        }
+      }, 5000);
       this.setState({
           interval
       })
@@ -64,34 +75,37 @@ export default class AdoptPage extends React.Component {
   }
 
 
-  userReady = () => {
-      if (this.context.people[1] === this.state.currentUser) {
-          clearInterval(this.state.interval);
-          this.setState({
-              userCanAdopt: true
-          });
-      };
+  // userReady = () => {
+  //     if (this.context.people[0] === this.state.currentUser) {
+  //         clearInterval(this.state.interval);
+  //         this.setState({
+  //             userCanAdopt: true
+  //         });
+  //     };
 
-  }
+  // }
 
   adoptCat = () => {
 
       this.context.onDeleteCat();
       this.context.onDeletePerson();
-      this.props.history.push({
-          pathname: '/success',
-          state: this.context.cats
-      })
+      // this.props.history.push({
+      //     pathname: '/success',
+      //     state: this.context.cats
+      // })
+      alert('congratulations on your adoption');
 
   }
 
   adoptDog = () => {
       this.context.onDeleteDog();
       this.context.onDeletePerson();
-      this.props.history.push({
-          pathname: '/success',
-          state: this.context.dogs
-      })
+      // this.props.history.push({
+      //     pathname: '/success',
+      //     state: this.context.dogs
+      // })
+      alert('congratulations on your adoption');
+
   }
 
 

@@ -5,7 +5,7 @@ import LandingPage from '../LandingPage/LandingPage';
 import AdoptPage from '../AdoptPage/AdoptPage';
 import Context from '../Context';
 import config from '../config';
-import Success from '../Success/Success';
+// import Success from '../Success/Success';
 
 export default class Root extends Component {
 
@@ -34,14 +34,16 @@ export default class Root extends Component {
 
         return Promise.all([resPeople.json(), resCats.json(), resDogs.json()]);
       })
-      .then(([people, cats, dogs]) =>
+      .then(([people, cats, dogs]) =>{
+  
+      console.log(people,cats,dogs,"fetch");
         this.setState(
           {
             people: people,
-            cats: cats,
-            dogs: dogs
+            cats: cats[0].cat,
+            dogs: dogs[0].dog
           }
-        ))
+        )})
       .catch(error => {
         console.error({ error })
       })
@@ -78,6 +80,7 @@ export default class Root extends Component {
           return fetch(`${config.API_ENDPOINT}/people`)
             .then((data) => data.json())
             .then((result) => {
+              console.log(result, "result");
               this.setState({
                 people: result
               });
@@ -96,7 +99,7 @@ export default class Root extends Component {
       method: "DELETE",
     })
       .then((res) => {
-        if (res.status === 201) {
+        if (res.status === 204) {
           return fetch(`${config.API_ENDPOINT}/people`)
             .then((data) => data.json())
             .then((result) => {
@@ -118,12 +121,12 @@ export default class Root extends Component {
       method: 'DELETE',
     })
       .then((res) => {
-        if (res.status === 201) {
+        if (res.status === 204) {
           return fetch(`${config.API_ENDPOINT}/pets/dogs`)
             .then((data) => data.json())
             .then((result) => {
               this.setState({
-                dogs: result,
+                dogs: result[0].dog,
               });
             });
         } else {
@@ -140,12 +143,13 @@ export default class Root extends Component {
       method: 'DELETE',
     })
       .then((res) => {
-        if (res.status === 201) {
+        if (res.status === 204) {
           fetch(`${config.API_ENDPOINT}/pets/cats`)
             .then((data) => data.json())
             .then((result) => {
+              console.log(result,"result")
               this.setState({
-                cats: result,
+                cats: result[0].cat,
               });
             })
         } else {
@@ -153,7 +157,7 @@ export default class Root extends Component {
         }
       })
       .catch((err) => {
-        console.err(err);
+        console.error(err);
       })
   }
 
@@ -186,7 +190,7 @@ export default class Root extends Component {
           <Switch>
             <Route exact path='/' component={LandingPage} />
             <Route exact path='/adopt' component={AdoptPage} />
-            <Router path='/success' component={Success} />
+          
           </Switch>
         </Context.Provider>
       </div>

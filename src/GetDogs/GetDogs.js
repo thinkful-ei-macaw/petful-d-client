@@ -6,6 +6,7 @@ export default class GetDogs extends Component {
     static contextType = Context;
 
     render() {
+        console.log(this.context,"context");
         const {
             age,
             breed,
