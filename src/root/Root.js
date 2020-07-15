@@ -141,6 +141,7 @@ export default class Root extends Component {
   deleteCat = () => {
     fetch(`${config.API_ENDPOINT}/pets/cats`, {
       method: 'DELETE',
+
     })
       .then((res) => {
         if (res.status === 204) {
