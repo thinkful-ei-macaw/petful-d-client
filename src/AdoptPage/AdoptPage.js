@@ -7,11 +7,11 @@ import config from "../config";
 import React, { Component } from "react";
 // import "./Adoption.css";
 // import Services from '../Services';
-import Form from '../Form/Form';
+// import Form from '../Form/Form';
 // import config from "../config";
-import GetCats from '../GetCats/GetCats';
-import GetDogs from '../GetDogs/GetDogs';
-import Context from '../Context';
+// import GetCats from '../GetCats/GetCats';
+// import GetDogs from '../GetDogs/GetDogs';
+// import Context from '../Context';
 // import Services from '../Services';
 
 
@@ -28,7 +28,7 @@ export default class AdoptPage extends Component {
   
     componentDidMount() {
       fetch(`${config.API_ENDPOINT}/pets`).then((res) => res.json()).then((data) => {
-        console.log('data:', data)
+        console.log(data,"data");
         this.setState({
           dog: data.nextDog,
           cat: data.nextCat,
@@ -115,10 +115,10 @@ export default class AdoptPage extends Component {
   
     nextInLine() {
       const newNames = [
-        { Name: 'Sasha Morales' },
-        { Name: 'Trinity Hart' },
-        { Name: 'Ariel Forrest' },
-        { Name: 'Bob Pilterfrost' }
+        { Name: 'Pete' },
+        { Name: 'Sam' },
+        { Name: 'Alex' },
+        { Name: 'Evie' }
       ];
       const thisPage = this;
       let counter = 3;
@@ -159,9 +159,9 @@ export default class AdoptPage extends Component {
   
     render() {
       const { dog, cat, people, otherCats, otherDogs, currentUser } = this.state
-      // const people = this.state.people;
-      // const dog = this.state.dog;
-      // const cat = this.state.cat;
+    //   const people = this.state.people;
+    //   const dog = this.state.dog;
+    //   const cat = this.state.cat;
       if (people[0] === currentUser && people.length === 1) {
         this.nextInLine();
       }
