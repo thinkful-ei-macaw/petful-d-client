@@ -1,6 +1,6 @@
 // import React, { Component } from "react";
 // // import { Link } from "react-router-dom";
-// // import Config from "../Config";
+import config from "../config";
 // import GetPets from '../GetPets/GetPets';
 // import Form from '../Form/Form';
 
@@ -15,212 +15,238 @@ import Context from '../Context';
 // import Services from '../Services';
 
 
-export default class AdoptPage extends React.Component {
-  static contextType = Context;
-
-  state = {
-      currentUser: '',
-      // currentCat: this.context.cats,
-      userCanAdopt: false,
-      interval: null,
-  }
-
-  componentWillUnmount = () => {
-      clearInterval(this.state.interval);
-  };
-
-
-  addPerson = (person) => {
+export default class AdoptPage extends Component {
+    state = {
+      dog: {},
+      cat: {},
+      otherCats: [],
+      otherDogs: [],
+      people: [],
+      currentUser: null,
+      petChoice: true
+    };
+  
+    componentDidMount() {
+      fetch(`${config.API_ENDPOINT}/pets`).then((res) => res.json()).then((data) => {
+        console.log('data:', data)
+        this.setState({
+          dog: data.nextDog,
+          cat: data.nextCat,
+          otherCats: data.allCats.slice(2,4),
+          otherDogs: data.allDogs.slice(2,4),
+        });
+      });
+      fetch(`${config.API_ENDPOINT}/people`).then((res) => res.json()).then((data) => {
+        console.log(data);
+        this.setState({
+          people: data
+        });
+      });
+    }
+  
+    onJoinQueue(e) {
+      e.preventDefault();
+      const name = { Name: e.target.name.value };
+      const add = this.state.people;
+      add.push(e.target.name.value);
+  
+      fetch(`${config.API_ENDPOINT}/people`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(name)
+      });
+  
       this.setState({
-          currentUser: person
-      })
-  }
-
-
-  getInLine = () => {
-      let count = 0;
-      const interval = setInterval(() => {
-        if (this.context.people.length === 0) {
-          console.log("testtest")
-          this.context.onQueuePerson();
-
-            // setInterval(() => {
-            //     if (count === 4) {
-            //         return clearInterval()
-            //     }
-            //     this.context.onQueuePerson()
-            //     count++;
-            //     console.log(count)
-
-            // }, 2000);
-
-        }else if(this.context.people[0]===this.state.currentUser){
-          clearInterval(this.state.interval);
-          this.setState({
-              userCanAdopt: true
-          });
-
+        people: add,
+        currentUser: e.target.name.value
+      });
+      let thisPage = this;
+  
+      let interval = setInterval(function() {
+        let petChoice;
+  
+        if (thisPage.state.petChoice === true) {
+          petChoice = { type: 'cat' };
+        } else {
+          petChoice = { type: 'dog' };
         }
-        else{
-          
-          this.context.onDeletePerson();
-          this.context.onRandomAdoption();
-       
+  
+        thisPage.fetchData(petChoice);
+  
+        thisPage.setState({
+          petChoice: !thisPage.state.petChoice
+        });
+        if (thisPage.state.people[1] === thisPage.state.currentUser) {
+          clearInterval(interval);
         }
       }, 5000);
-      this.setState({
-          interval
+  
+      e.target.name.value = '';
+    }
+  
+    fetchData(petChoice) {
+      fetch(`${config.API_ENDPOINT}/pets`, {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(petChoice)
       })
-
-  }
-
-
-  // userReady = () => {
-  //     if (this.context.people[0] === this.state.currentUser) {
-  //         clearInterval(this.state.interval);
-  //         this.setState({
-  //             userCanAdopt: true
-  //         });
-  //     };
-
-  // }
-
-  adoptCat = () => {
-
-      this.context.onDeleteCat();
-      this.context.onDeletePerson();
-      // this.props.history.push({
-      //     pathname: '/success',
-      //     state: this.context.cats
-      // })
-      alert('congratulations on your adoption');
-
-  }
-
-  adoptDog = () => {
-      this.context.onDeleteDog();
-      this.context.onDeletePerson();
-      // this.props.history.push({
-      //     pathname: '/success',
-      //     state: this.context.dogs
-      // })
-      alert('congratulations on your adoption');
-
-  }
-
-
-  render() {
-      // console.log(this.props.history)
-      // console.log(this.context.cats)
-      console.log(this.context.people)
+        .then(() => {
+          return fetch(`${config.API_ENDPOINT}/pets`);
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          this.setState({
+            dog: data.nextDog,
+            cat: data.nextCat
+          });
+          return fetch(`${config.API_ENDPOINT}/people`);
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          this.setState({
+            people: data
+          });
+        });
+    }
+  
+    nextInLine() {
+      const newNames = [
+        { Name: 'Sasha Morales' },
+        { Name: 'Trinity Hart' },
+        { Name: 'Ariel Forrest' },
+        { Name: 'Bob Pilterfrost' }
+      ];
+      const thisPage = this;
+      let counter = 3;
+      const add = this.state.people;
+      add.push(newNames[counter].Name);
+  
+      let interval = setInterval(function() {
+        fetch(`${config.API_ENDPOINT}/people`, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify(newNames[counter--])
+        }).then(() => {
+          thisPage.updatePeopleList();
+        });
+        if (counter === -1) {
+          clearInterval(interval);
+        }
+      }, 5000);
+    }
+  
+    updatePeopleList = () => {
+      fetch(`${config.API_ENDPOINT}/people`).then((res) => res.json()).then((data) => {
+        console.log(data);
+        this.setState({
+          people: data
+        });
+      });
+    };
+  
+    adopt(e) {
+      e.preventDefault();
+      let type = { type: e.target.id };
+      this.fetchData(type);
+      alert('Congratulations! You have successfully adopted your new pet!!');
+    }
+  
+    render() {
+      const { dog, cat, people, otherCats, otherDogs, currentUser } = this.state
+      // const people = this.state.people;
+      // const dog = this.state.dog;
+      // const cat = this.state.cat;
+      if (people[0] === currentUser && people.length === 1) {
+        this.nextInLine();
+      }
       return (
-          <div className="adoption">
-              <div className="adopt-header">
-              <h1 >Get Ready to Adopt!</h1>
-              <h2>The following people are in line for adoption:</h2>
-              </div>
-              <div className="people-list">
+        <div className='adoption'>
+          <h1>Adopt a Pet</h1>
+          <div className='pets-container'>
+            <div className='dogBox'>
+              <h2>Next Dog Up!</h2>
+              <img src={dog.imageURL} alt={dog.description} />
+              <li className='imageDesc'>
+                <br />
+                <em>"{dog.description}"</em>
+              </li>
               <ul>
-                  {this.context.people.map(person =>
-                      <li key={this.context.people + Math.random()}>
-                          {person}
-                      </li>
-                  )}
+                <br />
+                <li>Name: {dog.name}</li>
+                <br />
+                <li>Gender: {dog.gender}</li>
+                <br />
+                <li>Age: {dog.age} years old</li>
+                <br />
+                <li>Breed: {dog.breed}</li>
+                <br />
+                <li>Story: {dog.story}</li>
               </ul>
+              {this.state.currentUser &&
+              this.state.currentUser === people[0] && (
+                <form id='dog'>
+                  <button id='dog' onClick={(e) => this.adopt(e)}>
+                    Adopt Me!
+                  </button>
+                </form>
+              )}
+            </div>
+            <div className='catBox'>
+              <h2>Next Cat Up!</h2>
+              <img src={cat.imageURL} alt={cat.description} />
+              <li className='imageDesc'>
+                <br />
+                <em>"{cat.description}"</em>
+              </li>
+              <ul>
+                <br />
+                <li>Name: {cat.name}</li>
+                <br />
+                <li>Gender: {cat.gender}</li>
+                <br />
+                <li>Age: {cat.age} years old</li>
+                <br />
+                <li>Breed: {cat.breed}</li>
+                <br />
+                <li>Story: {cat.story}</li>
+              </ul>
+  
+              <div className='other-pets'>
+                <ul>
+                  {otherCats.map((cat, i) => 
+                    <li key={i}>{cat.name}</li>)}
+                  {otherDogs.map((dog, i) => 
+                    <li key={i}>{dog.name}</li>)}
+                </ul>
               </div>
-             
-              {!this.state.currentUser && (
-                  <Form add={this.addPerson}
-                      queueLine={this.getInLine}
-                  />
+  
+              {this.state.currentUser &&
+              this.state.currentUser === people[0] && (
+                <form id='cat'>
+                  <button id='cat' onClick={(e) => this.adopt(e)}>
+                    Adopt Me!
+                  </button>
+                </form>
               )}
-            
-              {this.state.currentUser && !this.state.userCanAdopt && (
-                  <p>
-                      Excellent! Please wait in line. When your name appears, you will be able to adopt a pet!
-                  </p>
-              )}
-              {this.state.userCanAdopt && <h2>Your turn!</h2>}
-              <GetDogs adopt={this.state.userCanAdopt}
-                  demoAdopt={this.adoptDog}/>
-              <GetCats adopt={this.state.userCanAdopt}
-                  demoAdopt={this.adoptCat}/>
+            </div>
           </div>
-      )
+          <section className='adoptionQ'>
+            <h3>In love yet? Join the queue below...</h3>
+            <label>Adoption Queue</label>
+            <ol>{people.map((person, i) => <li key={i}>{person}</li>)}</ol>
+            <form onSubmit={(e) => this.onJoinQueue(e)}>
+              <label>Name:</label>
+              <input type='text' name='name' />
+              <button>Join Queue</button>
+            </form>
+          </section>
+        </div>
+      );
+    }
   }
-}
-
-
-// class AdoptPage extends Component {
-
-
-//   render() {
-//     return (
-//       <div className='petContainer'>
-//       <Form updatePeople={() => this.props.updatePeople()}></Form>
-//       <GetPets
-//         cats={this.props.cats}
-//         dogs={this.props.dogs}
-//         people={this.props.people}
-//         updateCats={() => this.props.updateCats()}
-//         updateDogs={() => this.props.updateDogs()}
-//         updatePeople={() => this.props.updatePeople()}
-//         adoptedDogs={this.props.adoptedDogs}
-//         adoptedCats={this.props.adoptedCats}
-//       ></GetPets>
-//     </div>
-   
-//     );
-//   }
-// }
-
-// export default AdoptPage;
-
-// state = {
-
-//   name: "",
-// };
-
-// componentDidMount() {
-//   this.getPeople();
-// }
-
-// handleSubmit=e=>{
-//     e.preventDefault();
-//     let name=this.state.name;
-//     this.setState({name:''})
-
-// }
-
-
-// getPeople = () => {
-//   fetch(`${Config.API_ENDPOINT}/people/`, {
-//     method: "get",
-//     headers: {
-//       "content-type": "application/json",
-//     },
-//   })
-//     .then(res => res.json())
-//     .then(data => {
-//       this.setState({
-//         people: data,
-//       });
-//     });
-// };
-
-// static contextType=Context
-
-// <div>
-// <p>This is the Adoption Page</p>
-// <p>Please enter your name below to enter the pet queue.</p>
-// {this.state.people.map(person => (
-//   <li>{person}</li>
-// ))}
-// <form onSubmit={this.handleSubmit}>
-// <label htmlFor="name">Name: </label>
-// <input type="text" id="name" name="name" value={this.state.name}
-// onChange={e => this.setState({name:e.target.value})}
-// />
-// <button type="submit">Submit</button>
-// </form>
-// </div>

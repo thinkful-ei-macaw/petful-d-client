@@ -1,95 +1,64 @@
-import config from './config'
+import config from './config';
 
-const Services = {
+const PetfulApi = {
+	url: config.API_ENDPOINT,
 
+	getAllCats() {
+		return fetch(this.url + '/pets/cats', {}).then(
+			(res) => (!res.ok ? res.json().then((e) => Promise.reject(e)) : res.json())
+		);
+	},
+	adoptCat() {
+		return fetch(this.url + '/pets/cats', { method: 'DELETE' }).then((res) => {
+			if (!res.ok) {
+				return res.json().then((e) => Promise.reject(e));
+			}
+			return res.json();
+		});
+	},
+	getAllDogs() {
+		return fetch(this.url + '/pets/dogs', {}).then(
+			(res) => (!res.ok ? res.json().then((e) => Promise.reject(e)) : res.json())
+		);
+	},
+	adoptDog() {
+		return fetch(this.url + '/pets/dogs', { method: 'DELETE' }).then((res) => {
+			if (!res.ok) {
+				return res.json().then((e) => Promise.reject(e));
+			}
+			return res.json();
+		});
+	},
+	enqueueCat(cat) {
+		return fetch(this.url + '/pets/cats', { 
+			method: 'POST', 
+			headers: {
+				'content-type':'application/json'
+			},  
+			body:JSON.stringify({cat})
+		 })
+		 .then((res) => {
+			if (!res.ok) {
+				return res.json().then((e) => Promise.reject(e));
+			}
+			return res.json();
+		});
+	},
+	enqueueDog(dog) {
+		return fetch(this.url + '/pets/dogs', { 
+			method: 'POST', 
+			headers: {
+				'content-type':'application/json'
+			},  
+			body:JSON.stringify({dog})
+		 })
+		 .then((res) => {
+			if (!res.ok) {
+				return res.json().then((e) => Promise.reject(e));
+			}
+			return res.json();
+		});
+	},
+};
 
-//k;lj;kj old below
-  // getCats() {
-  //   return fetch(`${config.API_ENDPOINT}/pets/cats`, {
-  //     headers: {
-
-  //     },
-  //   })
-  //   .then(res =>
-  //     (!res.ok)
-  //       ? res.json().then(e => Promise.reject(e))
-  //       : res.json()
-  //   )
-  // },
-  // getDogs() {
-  //   return fetch(`${config.API_ENDPOINT}/pets/dogs`, {
-  //     headers: {
-
-  //     },
-  //   })
-  //   .then(res =>
-  //     (!res.ok)
-  //       ? res.json().then(e => Promise.reject(e))
-  //       : res.json()
-  //   )
-  // },
-  // getPeople() {
-  //   return fetch(`${config.API_ENDPOINT}/people`, {
-  //     headers: {
-
-  //     },
-  //   })
-  //   .then(res =>
-  //     (!res.ok)
-  //       ? res.json().then(e => Promise.reject(e))
-  //       : res.json()
-  //   )
-  // },
-  // adoptCat() {
-  //   return fetch((`${config.API_ENDPOINT}/pets/cats`),
-  //   {
-  //     method: 'DELETE',
-  //     headers: { 'content-type': 'application/json' },
-  //   }
-  //   )
-  //   .then(res => {
-  //     if (!res.ok)
-  //       return res.json().then(e => Promise.reject(e))
-  //     return 1;
-  //   })
-  //   .catch(error => {
-	// 		alert(error.message)
-	// 	})
-  // },
-
-  // adoptDog() {
-  //   return fetch((`${config.API_ENDPOINT}/pets/dogs`),
-  //   {
-  //     method: 'DELETE',
-  //     headers: { 'content-type': 'application/json' },
-  //   }
-  //   )
-  //   .then(res => {
-  //     if (!res.ok)
-  //       return res.json().then(e => Promise.reject(e))
-  //     return 1;
-  //   })
-  //   .catch(error => {
-	// 		alert(error.message)
-	// 	})
-  // },
-
-  // signUp(newName) {
-  //   return fetch(`${config.API_ENDPOINT}/people`,
-  //   {
-  //     method: 'POST',
-  //     headers: { 'content-type': 'application/json' },
-  //     body: newName,
-  //   })
-  //   .then(res => {
-  //     if (!res.ok)
-  //       return res.json().then(e => Promise.reject(e))
-  //     return 1;
-  //   })
-  //   .catch(error => {
-	// 		alert(error.message)
-	// 	})
-  // },
-}
-
-export default Services;
+export default PetfulApi

@@ -1,203 +1,25 @@
 import React, {Component} from 'react'
 // import {Switch, Route, Link} from 'react-router-dom';
-import {Switch, Route} from 'react-router-dom';
+// import {Switch, Route} from 'react-router-dom';
 import LandingPage from '../LandingPage/LandingPage';
 import AdoptPage from '../AdoptPage/AdoptPage';
 import Context from '../Context';
 import config from '../config';
+import {BrowserRouter, Route} from 'react-browser-router';
 // import Success from '../Success/Success';
-
 export default class Root extends Component {
-
-  state = {
-    people: [],
-    cats: [],
-    dogs: []
-  };
-
-  componentDidMount() {
-    Promise.all([
-      fetch(`${config.API_ENDPOINT}/people`),
-      fetch(`${config.API_ENDPOINT}/pets/cats`),
-      fetch(`${config.API_ENDPOINT}/pets/dogs`),
-    ])
-      .then(([resPeople, resCats, resDogs]) => {
-        if (!resPeople.ok) {
-          return resPeople.json().then(e => Promise.reject(e));
-        }
-        if (!resCats.ok) {
-          return resCats.json().then(e => Promise.reject(e));
-        }
-        if (!resDogs.ok) {
-          return resDogs.json().then(e => Promise.reject(e));
-        }
-
-        return Promise.all([resPeople.json(), resCats.json(), resDogs.json()]);
-      })
-      .then(([people, cats, dogs]) =>{
-  
-      console.log(people,cats,dogs,"fetch");
-        this.setState(
-          {
-            people: people,
-            cats: cats[0].cat,
-            dogs: dogs[0].dog
-          }
-        )})
-      .catch(error => {
-        console.error({ error })
-      })
-
-  }
-
-
-  addPeople = (name) => {
-    fetch(`${config.API_ENDPOINT}/people`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ name })
-    });
-    this.setState({
-      people: [...this.state.people, name]
-    })
-  }
-
-  queuePerson = () => {
-    fetch(`${config.API_ENDPOINT}/people`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: `Test Person ${Math.floor(Math.random() * 100)}`,
-      })
-
-    })
-      .then((res) => {
-        if (res.status === 201) {
-          return fetch(`${config.API_ENDPOINT}/people`)
-            .then((data) => data.json())
-            .then((result) => {
-              console.log(result, "result");
-              this.setState({
-                people: result
-              });
-            });
-        } else {
-          throw new Error("The post request failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });;
-  }
-
-  deletePeople = () => {
-    fetch(`${config.API_ENDPOINT}/people`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (res.status === 204) {
-          return fetch(`${config.API_ENDPOINT}/people`)
-            .then((data) => data.json())
-            .then((result) => {
-              this.setState({
-                people: result,
-              });
-            });
-        } else {
-          throw new Error("The delete request failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
-  deleteDog = () => {
-    fetch(`${config.API_ENDPOINT}/pets/dogs`, {
-      method: 'DELETE',
-    })
-      .then((res) => {
-        if (res.status === 204) {
-          return fetch(`${config.API_ENDPOINT}/pets/dogs`)
-            .then((data) => data.json())
-            .then((result) => {
-              this.setState({
-                dogs: result[0].dog,
-              });
-            });
-        } else {
-          throw new Error("The delete request failed")
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-  }
-
-  deleteCat = () => {
-    fetch(`${config.API_ENDPOINT}/pets/cats`, {
-      method: 'DELETE',
-
-    })
-      .then((res) => {
-        if (res.status === 204) {
-          fetch(`${config.API_ENDPOINT}/pets/cats`)
-            .then((data) => data.json())
-            .then((result) => {
-              console.log(result,"result")
-              this.setState({
-                cats: result[0].cat,
-              });
-            })
-        } else {
-          throw new Error("Delete request failed")
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-  }
-
-  randomAdoption = () => {
-    let value = Math.floor(Math.random() * 2);
-    if (value === 1) {
-      this.deleteCat();
-    } else {
-      this.deleteDog();
-    }
-  }
-
   render() {
-    console.log(this.state.people)
-    const contextValue = {
-      people: this.state.people,
-      cats: this.state.cats,
-      dogs: this.state.dogs,
-      onAddPerson: this.addPeople,
-      onDeletePerson: this.deletePeople,
-      onDeleteDog: this.deleteDog,
-      onDeleteCat: this.deleteCat,
-      onQueuePerson: this.queuePerson,
-      onRandomAdoption: this.randomAdoption
-    }
-
     return (
-      <div>
-        <Context.Provider value={contextValue}>
-          <Switch>
-            <Route exact path='/' component={LandingPage} />
-            <Route exact path='/adopt' component={AdoptPage} />
-          
-          </Switch>
-        </Context.Provider>
-      </div>
-    )
+      <BrowserRouter>
+ 
+        <Route exact path='/' component={LandingPage} />
+        <Route exact path='/Adopt' component={AdoptPage} />
+      </BrowserRouter>
+    );
   }
 }
+
+
 
 // function Root() {
 //   return (
