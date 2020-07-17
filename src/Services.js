@@ -1,64 +1,83 @@
-import config from './config';
+import config from './config'
 
-const PetfulApi = {
-	url: config.API_ENDPOINT,
+const Services = {
+  getDog() {
+    return fetch(`${config.API_ENDPOINT}/pets/dog`)
+      .then((dog) => {
+      if (!dog.ok) {
+        throw new Error('no available dogs')
+      }
+      return dog.json();
+    })
+},
 
-	getAllCats() {
-		return fetch(this.url + '/pets/cats', {}).then(
-			(res) => (!res.ok ? res.json().then((e) => Promise.reject(e)) : res.json())
-		);
-	},
-	adoptCat() {
-		return fetch(this.url + '/pets/cats', { method: 'DELETE' }).then((res) => {
-			if (!res.ok) {
-				return res.json().then((e) => Promise.reject(e));
-			}
-			return res.json();
-		});
-	},
-	getAllDogs() {
-		return fetch(this.url + '/pets/dogs', {}).then(
-			(res) => (!res.ok ? res.json().then((e) => Promise.reject(e)) : res.json())
-		);
-	},
-	adoptDog() {
-		return fetch(this.url + '/pets/dogs', { method: 'DELETE' }).then((res) => {
-			if (!res.ok) {
-				return res.json().then((e) => Promise.reject(e));
-			}
-			return res.json();
-		});
-	},
-	enqueueCat(cat) {
-		return fetch(this.url + '/pets/cats', { 
-			method: 'POST', 
-			headers: {
-				'content-type':'application/json'
-			},  
-			body:JSON.stringify({cat})
-		 })
-		 .then((res) => {
-			if (!res.ok) {
-				return res.json().then((e) => Promise.reject(e));
-			}
-			return res.json();
-		});
-	},
-	enqueueDog(dog) {
-		return fetch(this.url + '/pets/dogs', { 
-			method: 'POST', 
-			headers: {
-				'content-type':'application/json'
-			},  
-			body:JSON.stringify({dog})
-		 })
-		 .then((res) => {
-			if (!res.ok) {
-				return res.json().then((e) => Promise.reject(e));
-			}
-			return res.json();
-		});
-	},
-};
+  getCat() {
+    return fetch(`${config.API_ENDPOINT}/pets/cat`)
+      .then((cat) => {
+        if (!cat.ok) {
+          throw new Error('no available cats')
+        }
+        return cat.json();
+      })
+},
 
-export default PetfulApi
+  getPeople() {
+    return fetch(`${config.API_ENDPOINT}/people`)
+      .then((people) => {
+      if (!people.ok) {
+        throw new Error('empty queue')
+      }
+      return people.json();
+    })
+},
+
+  addPerson(name) {
+    return fetch(`${config.API_ENDPOINT}/people`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        person: name,
+      }),
+    })
+      .then((res) =>
+        !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
+      )
+  },
+
+  deleteDog() {
+    return fetch(`${config.API_ENDPOINT}/pets/dog`, {
+      method: "DELETE",
+    })
+      .then((res) =>
+        !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
+      )
+},
+
+  deleteCat() {
+    return fetch(`${config.API_ENDPOINT}/pets/cat`, {
+      method: "DELETE",
+    })
+      .then((res) =>
+        !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
+      )
+},
+
+  deletePerson(person) {
+    return fetch(`${config.API_ENDPOINT}/people`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: person,
+    }),
+  })
+    .then((res) =>
+      !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
+    )
+  },
+}
+
+export default Services

@@ -1,0 +1,20 @@
+.description {
+    margin-left: 250px;
+    margin-right: 250px;
+    margin-bottom: 100px;
+  }
+  
+  main {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: flex-end;
+  }
+  
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: auto;
+  }

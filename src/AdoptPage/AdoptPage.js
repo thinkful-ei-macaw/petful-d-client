@@ -1,252 +1,228 @@
-// import React, { Component } from "react";
-// // import { Link } from "react-router-dom";
-import config from "../config";
-// import GetPets from '../GetPets/GetPets';
-// import Form from '../Form/Form';
-
 import React, { Component } from "react";
-// import "./Adoption.css";
-// import Services from '../Services';
-// import Form from '../Form/Form';
-// import config from "../config";
-// import GetCats from '../GetCats/GetCats';
-// import GetDogs from '../GetDogs/GetDogs';
-// import Context from '../Context';
-// import Services from '../Services';
+import './AdoptPage.css';
+import Services from '../Services';
+import Form from '../Form/Form';
 
+class AdoptPage extends Component {
+  state = {
+    typeOfPet: "dog",
+    dog: {},
+    cat: {},
+    people: [],
+    first: false,
+    removeTimer: null,
+  };
 
-export default class AdoptPage extends Component {
-    state = {
-      dog: {},
-      cat: {},
-      otherCats: [],
-      otherDogs: [],
-      people: [],
-      currentUser: null,
-      petChoice: true
-    };
-  
-    componentDidMount() {
-      fetch(`${config.API_ENDPOINT}/pets`).then((res) => res.json()).then((data) => {
-        console.log(data,"data");
+  componentDidMount() {
+
+    Services.getPeople()
+      .then((person) => {
         this.setState({
-          dog: data.nextDog,
-          cat: data.nextCat,
-          otherCats: data.allCats.slice(2,4),
-          otherDogs: data.allDogs.slice(2,4),
+          people: person,
         });
       });
-      fetch(`${config.API_ENDPOINT}/people`).then((res) => res.json()).then((data) => {
-        console.log(data);
+
+    Services.getDog()
+      .then((dog) => {
         this.setState({
-          people: data
+          dog: dog,
         });
       });
-    }
-  
-    onJoinQueue(e) {
-      e.preventDefault();
-      const name = { Name: e.target.name.value };
-      const add = this.state.people;
-      add.push(e.target.name.value);
-  
-      fetch(`${config.API_ENDPOINT}/people`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(name)
+
+    Services.getCat()
+      .then((cat) => {
+        this.setState({
+          cat: cat,
+        });
       });
-  
+  }
+
+  postUser = (name) => {
+    Services.addPerson(name)
+      .then((people) => {
+        this.setState({
+          people
+        });
+      });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let type = e.target["pet-type"].value;
+    let user = e.target["addName"].value;
+    this.postUser(user);
+
+    let removeTimer = setInterval(() => {
+      this.handleTimerFuncs();
+    }, 5000);
+
+    this.setState({
+      typeOfPet: type,
+      removeTimer,
+    });
+  };
+
+  handleTimerFuncs = () => {
+    let newPeople = [
+      "Jacob Ray",
+      "Barb Cyrus",
+      "Sam Trevor",
+      "J Roc"
+    ];
+
+    if (this.state.people.length > 1) {
+      Services.deletePerson(this.state.people[0])
+        .then((people) => {
+          this.setState({
+            people,
+          });
+        });
+      Services.deleteDog()
+        .then((dog) => {
+          this.setState({
+            dog: dog,
+          });
+        });
+      Services.deleteCat()
+        .then((cat) => {
+          this.setState({
+            cat: cat,
+          });
+        });
+    } else {
+
+      clearInterval(this.state.removeTimer);
+      let i = 0;
+      let addInterval = setInterval(() => {
+        this.postUser(newPeople[i]);
+        i++;
+      }, 5000);
+      this.postUser("Phil Collins")
+
       this.setState({
-        people: add,
-        currentUser: e.target.name.value
-      });
-      let thisPage = this;
-  
-      let interval = setInterval(function() {
-        let petChoice;
-  
-        if (thisPage.state.petChoice === true) {
-          petChoice = { type: 'cat' };
-        } else {
-          petChoice = { type: 'dog' };
-        }
-  
-        thisPage.fetchData(petChoice);
-  
-        thisPage.setState({
-          petChoice: !thisPage.state.petChoice
-        });
-        if (thisPage.state.people[1] === thisPage.state.currentUser) {
-          clearInterval(interval);
-        }
-      }, 5000);
-  
-      e.target.name.value = '';
-    }
-  
-    fetchData(petChoice) {
-      fetch(`${config.API_ENDPOINT}/pets`, {
-        method: 'DELETE',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(petChoice)
+        first: true
       })
-        .then(() => {
-          return fetch(`${config.API_ENDPOINT}/pets`);
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          this.setState({
-            dog: data.nextDog,
-            cat: data.nextCat
-          });
-          return fetch(`${config.API_ENDPOINT}/people`);
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          this.setState({
-            people: data
-          });
-        });
+
+
+      setTimeout(() => {
+        clearInterval(addInterval);
+      }, 20000);
     }
-  
-    nextInLine() {
-      const newNames = [
-        { Name: 'Pete' },
-        { Name: 'Sam' },
-        { Name: 'Alex' },
-        { Name: 'Evie' }
-      ];
-      const thisPage = this;
-      let counter = 3;
-      const add = this.state.people;
-      add.push(newNames[counter].Name);
-  
-      let interval = setInterval(function() {
-        fetch(`${config.API_ENDPOINT}/people`, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify(newNames[counter--])
-        }).then(() => {
-          thisPage.updatePeopleList();
-        });
-        if (counter === -1) {
-          clearInterval(interval);
-        }
-      }, 5000);
+  };
+
+  renderPeople = () => {
+    let people = this.state.people;
+    if (people.length > 1) {
+      return people.map((person, index) => (
+        <Form key={index} name={person} />
+      ));
     }
-  
-    updatePeopleList = () => {
-      fetch(`${config.API_ENDPOINT}/people`).then((res) => res.json()).then((data) => {
-        console.log(data);
+    return <Form key="0" name={people[0]} />;
+  };
+
+  renderDog = () => {
+    let { dog } = this.state;
+    return (
+      <section>
+        <ul>
+          <img src={dog.imageURL} alt={dog.description}></img>
+          <li>Name: {dog.name}</li>
+          <li>Gender: {dog.gender}</li>
+          <li>Breed: {dog.breed}</li>
+          <li>Description: {dog.description}</li>
+          <li>Journey to the Shelter: {dog.story}</li>
+        </ul>
+      </section>
+    );
+  };
+
+  renderCat = () => {
+    let { cat } = this.state;
+    return (
+      <section>
+        <img src={cat.imageURL} alt={cat.description}></img>
+        <ul>
+          <li>NAME: {cat.name}</li>
+          <li>GENDER: {cat.gender}</li>
+          <li>BREED: {cat.breed}</li>
+          <li>Physical Description: {cat.description}</li>
+          <li>Story of the Journey to the Shelter: {cat.story}</li>
+        </ul>
+      </section>
+    );
+  };
+
+  handleAdopt = () => {
+    Services.deletePerson(this.state.people[0])
+      .then((people) => {
         this.setState({
-          people: data
+          people,
+          first: false,
         });
       });
-    };
-  
-    adopt(e) {
-      e.preventDefault();
-      let type = { type: e.target.id };
-      this.fetchData(type);
-      alert('Congratulations! You have successfully adopted your new pet!!');
+    if (this.state.typeOfPet === 'dog') {
+      Services.deleteDog()
+        .then((dog) => {
+          this.setState({
+            dog: dog,
+          });
+        });
+    } else {
+      Services.deleteCat()
+      .then((cat) => {
+        this.setState({
+          cat: cat,
+        });
+      });
     }
-  
-    render() {
-      const { dog, cat, people, otherCats, otherDogs, currentUser } = this.state
-    //   const people = this.state.people;
-    //   const dog = this.state.dog;
-    //   const cat = this.state.cat;
-      if (people[0] === currentUser && people.length === 1) {
-        this.nextInLine();
-      }
-      return (
-        <div className='adoption'>
-          <h1>Adopt a Pet</h1>
-          <div className='pets-container'>
-            <div className='dogBox'>
-              <h2>Next Dog Up!</h2>
-              <img src={dog.imageURL} alt={dog.description} />
-              <li className='imageDesc'>
-                <br />
-                <em>"{dog.description}"</em>
-              </li>
-              <ul>
-                <br />
-                <li>Name: {dog.name}</li>
-                <br />
-                <li>Gender: {dog.gender}</li>
-                <br />
-                <li>Age: {dog.age} years old</li>
-                <br />
-                <li>Breed: {dog.breed}</li>
-                <br />
-                <li>Story: {dog.story}</li>
-              </ul>
-              {this.state.currentUser &&
-              this.state.currentUser === people[0] && (
-                <form id='dog'>
-                  <button id='dog' onClick={(e) => this.adopt(e)}>
-                    Adopt Me!
-                  </button>
-                </form>
+    alert(`Congrats, you've adopted ${this.state.typeOfPet}!!`)
+  };
+
+  render() {
+    return (
+      <div>
+        <header>
+          <h1>Adoption</h1>
+        </header>
+
+        <main>
+          <section>
+            <h3>PET ON STAGE</h3>
+            {this.state.typeOfPet === "dog"
+              ? this.renderDog()
+              : this.renderCat()}
+            <h3>QUEUE</h3>
+            {this.renderPeople()}
+          </section>
+
+          <section id="form">
+            <form
+              onSubmit={this.handleSubmit}
+              name="addNameToList"
+              id="addNameToList"
+            >
+            
+              <select name="pet-type" defaultValue="dog">
+                <option>-select your pet-</option>
+                <option>dog</option>
+                <option>cat</option>
+              </select>
+              <label htmlFor="addName">Your Name:</label>
+              <input type="text" name="addName" id="addName"></input>
+              <button type="submit">get in line</button>
+              {this.state.first ? (
+                <button onClick={this.handleAdopt} type="button">
+                  adopt a baby!
+                </button>
+              ) : (
+                ""
               )}
-            </div>
-            <div className='catBox'>
-              <h2>Next Cat Up!</h2>
-              <img src={cat.imageURL} alt={cat.description} />
-              <li className='imageDesc'>
-                <br />
-                <em>"{cat.description}"</em>
-              </li>
-              <ul>
-                <br />
-                <li>Name: {cat.name}</li>
-                <br />
-                <li>Gender: {cat.gender}</li>
-                <br />
-                <li>Age: {cat.age} years old</li>
-                <br />
-                <li>Breed: {cat.breed}</li>
-                <br />
-                <li>Story: {cat.story}</li>
-              </ul>
-  
-              <div className='other-pets'>
-                <ul>
-                  {otherCats.map((cat, i) => 
-                    <li key={i}>{cat.name}</li>)}
-                  {otherDogs.map((dog, i) => 
-                    <li key={i}>{dog.name}</li>)}
-                </ul>
-              </div>
-  
-              {this.state.currentUser &&
-              this.state.currentUser === people[0] && (
-                <form id='cat'>
-                  <button id='cat' onClick={(e) => this.adopt(e)}>
-                    Adopt Me!
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-          <section className='adoptionQ'>
-            <h3>In love yet? Join the queue below...</h3>
-            <label>Adoption Queue</label>
-            <ol>{people.map((person, i) => <li key={i}>{person}</li>)}</ol>
-            <form onSubmit={(e) => this.onJoinQueue(e)}>
-              <label>Name:</label>
-              <input type='text' name='name' />
-              <button>Join Queue</button>
             </form>
           </section>
-        </div>
-      );
-    }
+        </main>
+      </div>
+    );
   }
+}
+
+export default AdoptPage;
